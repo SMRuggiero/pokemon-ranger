@@ -140,9 +140,13 @@ export class Pokemon {
                             return Math.floor((Math.floor((2 * base + IV + Math.floor(EV / 4)) * level / 100) + 5) * nature);
                 };
         };
-        //all scalars case
-        if (typeof(baseStat) === 'number' ){ 
-
+        //
+        if (this.baseStats.propertyType[stat] +
+            this.baseStats.propertyType[stat] +
+            this.baseStats.propertyType[stat] +
+            this.baseStats.propertyType[stat] + 
+            (Array.isArray(this.level) ? 1 : 0) === 0){ 
+                
         };
     };
 
@@ -215,12 +219,12 @@ class StatBlock {
         this._speed = speed;
         this.monitor = monitorPropertyType;
         this.updatedProperty = [0,0,0,0,0,0];
-        this.propertyType = [Array.isArray(this._hp),
-                            Array.isArray(this._attack),
-                            Array.isArray(this._defense),
-                            Array.isArray(this._specialAttack),
-                            Array.isArray(this._specialDefense),
-                            Array.isArray(this._speed)]; //0 for scalar, 1 for array
+        this.propertyType = {hp : Array.isArray(this._hp),
+                            attack : Array.isArray(this._attack),
+                            defense : Array.isArray(this._defense),
+                            specialAttack : Array.isArray(this._specialAttack),
+                            specialDefense : Array.isArray(this._specialDefense),
+                            speed : Array.isArray(this._speed)}; //0 for scalar, 1 for array
     };
 
     get hp(){
@@ -233,12 +237,12 @@ class StatBlock {
         if (Array.isArray(val)) {
             if (val.length === 1) {
                 val = val[0];
-                this.propertyType[0] = 0    
+                this.propertyType['hp'] = 0    
             } else {
-                this.propertyType[0] = 1
+                this.propertyType['hp'] = 1
             }
         } else {
-            this.propertyType[0] = 0
+            this.propertyType['hp'] = 0
         }
 
         if (this.monitor) this.updatedProperty[0] = 1;
@@ -254,9 +258,14 @@ class StatBlock {
         if (val === this._attack) return;
         
         if (Array.isArray(val)) {
-            this.propertyType[1] = 1
+            if (val.length === 1) {
+                val = val[0];
+                this.propertyType["attack"] = 0    
+            } else {
+                this.propertyType["attack"] = 1
+            }
         } else {
-            this.propertyType[1] = 0
+            this.propertyType["attack"] = 0
         }
 
         if (this.monitor) this.updatedProperty[1] = 1;
@@ -272,9 +281,14 @@ class StatBlock {
         if (val === this._defense) return;
         
         if (Array.isArray(val)) {
-            this.propertyType[2] = 1
+            if (val.length === 1) {
+                val = val[0];
+                this.propertyType['defense'] = 0    
+            } else {
+                this.propertyType['defense'] = 1
+            }
         } else {
-            this.propertyType[2] = 0
+            this.propertyType['defense'] = 0
         }
 
         if (this.monitor) this.updatedProperty[2] = 1;
@@ -290,9 +304,14 @@ class StatBlock {
         if (val === this._specialAttack) return;
         
         if (Array.isArray(val)) {
-            this.propertyType[3] = 1
+            if (val.length === 1) {
+                val = val[0];
+                this.propertyType['specialAttack'] = 0    
+            } else {
+                this.propertyType['specialAttack'] = 1
+            }
         } else {
-            this.propertyType[3] = 0
+            this.propertyType['specialAttack'] = 0
         }
 
         if (this.monitor) this.updatedProperty[3] = 1;
@@ -308,9 +327,14 @@ class StatBlock {
         if (val === this._specialDefense) return;
         
         if (Array.isArray(val)) {
-            this.propertyType[4] = 1
+            if (val.length === 1) {
+                val = val[0];
+                this.propertyType['specialDefense'] = 0;
+            } else {
+                this.propertyType['specialDefense'] = 1
+            }
         } else {
-            this.propertyType[4] = 0
+            this.propertyType['specialDefense'] = 0
         }
 
         if (this.monitor) this.updatedProperty[4] = 1;
@@ -326,9 +350,14 @@ class StatBlock {
         if (val === this._speed) return;
         
         if (Array.isArray(val)) {
-            this.propertyType[5] = 1
+            if (val.length === 1) {
+                val = val[0];
+                this.propertyType['speed'] = 0    
+            } else {
+                this.propertyType['speed'] = 1
+            }
         } else {
-            this.propertyType[5] = 0
+            this.propertyType['speed'] = 0
         }
 
         if (this.monitor) this.updatedProperty[5] = 1;
@@ -336,23 +365,6 @@ class StatBlock {
         this._speed = val;
     };
 
-    get hp(){
-        return this._hp
-    };
-
-    set hp(val){
-        if (val === this._hp) return;
-        
-        if (Array.isArray(val)) {
-            this.propertyType[0] = 1
-        } else {
-            this.propertyType[0] = 0
-        }
-
-        if (this.monitor) this.updatedProperty[0] = 1;
-
-        this._hp = val;
-    };
 };
 
 class BattleStageManager {
