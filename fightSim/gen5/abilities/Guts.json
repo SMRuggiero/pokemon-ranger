@@ -1,0 +1,48 @@
+{
+    "owner": "null",
+    "name": "Guts",
+    "effects": [
+        {
+            "effectType": "damageMuli",
+            "appliesTo": "owner",
+            "priority": null,
+            "conditions": [
+                {
+                    "subject": "owner",
+                    "subjectConditions": [
+                        {
+                            "property": "persistentStatus",
+                            "truthValues": {
+                                "truthy": [],
+                                "falsy": [
+                                    null,
+                                    "frozen"
+                                ]
+                            },
+                            "existenceCondition": "inherent"
+                        }
+                    ]
+                },
+                {
+                    "subject": "move",
+                    "subjectConditions": [
+                        {
+                            "property": "calcStats",
+                            "truthValues": {
+                                "truthy": [
+                                    [
+                                        "attack",
+                                        true
+                                    ]
+                                ],
+                                "falsy": []
+                            },
+                            "existenceCondition": "inherent"
+                        }
+                    ]
+                }
+            ],
+            "existenceCondition": "inherent"
+        }
+    ]
+}
