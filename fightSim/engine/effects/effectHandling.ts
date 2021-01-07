@@ -1,22 +1,11 @@
+import { EngineObject, Subject } from './effectTypes.js'
+import { EffectData, EffectConditionData, TruthValues, SubjectPropertyData } from './effectDataTypes.js'
+
 /* eslint-disable max-classes-per-file */
 
-type InjectableProperty<T> = string | T;
-
-export type EngineHookTarget = string;
-// Placeholder type
-export interface EngineObject {
-    isEngineComponent : boolean;
-}
+//type InjectableProperty<T> = string | T;
 
 
-export type Subject = EngineHookTarget | EngineObject;
-
-export type EffectInfo = {
-    effectType : string,
-    appliesTo : Subject;
-    priority : number | null,
-    conditions : Array<EffectConditionArgs>
-}
 
 function hasOwnProperty<X extends {}, Y extends PropertyKey>(obj: X, prop: Y): obj is X & Record<Y, unknown> {
     return obj.hasOwnProperty(prop);
@@ -28,60 +17,10 @@ const RECURSION_PROPERTIES = ['conditions', 'propertyConditions', 'existenceCond
 type RecursionProperty = typeof RECURSION_PROPERTIES[number];
 
 
-// Unused at the moment. Usable later?
-class Injectable {
-
-    proxyValue : EngineHookTarget;
-
-    constructor(proxyValue : EngineHookTarget) {
-        this.proxyValue = proxyValue;
-    }
-
-    checkInject(otherReferences : Array<[EngineHookTarget, EngineObject]> = []) : boolean | EngineObject{
-        if (typeof this.proxyValue === 'string' && this.proxyValue === "owner") return true;
-        
-        for (let i = 0; i < otherReferences.length; i += 1) {
-            const element =  otherReferences[i];
-            if (element[0] === this.proxyValue) return element[1];
-            
-        }
-        
-        return false;
-    }
-
-    injectPrimative() : EngineHookTarget {
-        return this.proxyValue;
-    }
-
-    toJSON(){
-        return this.proxyValue;
-    }
-
-}
-
-/*
-class Injector{
-  injectableRegistry : Array<Injectable>
-
-  constructor() {
-    this.injectableRegistry = [];
-  }
-
-  InjectReferences(owner : EngineObject, otherReferences : Array<EngineObject> = []){
-
-  }
-
-}
-*/
-
-
-
-
-
-export function InjectReferences(effectDataStructure : Array<EffectInfo | EffectConditionArgs | SPTConstructorArgs>, owner : EngineObject, otherReferences : Array<EngineObject> = []
-    ) : Array<EffectInfo | EffectConditionArgs | SPTConstructorArgs>{
+export function InjectReferences(effectDataStructure : Array<EffectData | EffectConditionData | SubjectPropertyData>, owner : EngineObject, otherReferences : Array<EngineObject> = []
+    ) : Array<EffectData | EffectConditionData | SubjectPropertyData>{
     // This function recursively replaces the string 'owner' with a reference to the effect owner.
-    // This function may be expanded to inject other references if development needs it.
+    // This function will be expanded to inject other references upon core development.
     
     const targetProperties: TargetProperty[] = ['subject', 'appliesTo'];
     const recurOn: RecursionProperty[] = ['conditions', 'propertyConditions', 'existenceCondition']; //as Array<keyof EffectInfo | keyof EffectConditionArgs | keyof SPTConstructorArgs>;
@@ -99,12 +38,12 @@ export function InjectReferences(effectDataStructure : Array<EffectInfo | Effect
         for (let k = 0; i < recurOn.length; i += 1) {
             const recursionCheckProp = recurOn[k];
             if (hasOwnProperty(effectDataElement, recursionCheckProp)){
-                InjectReferences(effectDataElement[recursionCheckProp] as Array<EffectInfo | EffectConditionArgs | SPTConstructorArgs>, owner, otherReferences)
+                InjectReferences(effectDataElement[recursionCheckProp] as Array<EffectData | EffectConditionData | SubjectPropertyData>, owner, otherReferences)
             }
         }    
     }
 
-    return effectDataStructure as Array<EffectInfo | EffectConditionArgs | SPTConstructorArgs>
+    return effectDataStructure as Array<EffectData | EffectConditionData | SubjectPropertyData>
 }
 
 export class Effect {
@@ -115,7 +54,7 @@ export class Effect {
     conditions : Array<EffectConditions>
     existenceCondition : 'inherent' | Array<EffectConditions>;
 
-    constructor(effectType : string, appliesTo : Subject, conditions : Array<EffectConditionArgs>, existenceCondition : 'inherent' | Array<EffectConditionArgs> = 'inherent') {
+    constructor(effectType : string, appliesTo : Subject, conditions : Array<EffectConditionData>, existenceCondition : 'inherent' | Array<EffectConditionData> = 'inherent') {
       this.effectType = effectType;
       this.appliesTo = appliesTo;
 
@@ -131,18 +70,11 @@ export class Effect {
     }
 }
 
-
-
-export type EffectConditionArgs = {
-    subject: Subject;
-    subjectConditions: Array<SPTConstructorArgs>;
-}
-
 export class EffectConditions {
     subject : Subject;
     subjectConditions : Array<SubjectPropertyTruths>;
 
-    constructor(subject : Subject, subjectTruths : Array<SPTConstructorArgs>) {
+    constructor(subject : Subject, subjectTruths : Array<SubjectPropertyData>) {
       this.subject = subject;
       this.subjectConditions = subjectTruths.map(value => new SubjectPropertyTruths(value.property,
         value.truthValues,
@@ -160,23 +92,14 @@ export class EffectConditions {
     }
 }
 
-export type TruthValues = {
-    truthy : Array<string | boolean | null> | Array<Array<string | boolean | null>>;
-    falsy : Array<string | boolean | null> | Array<Array<string | boolean | null>>;
-}
 
-export type SPTConstructorArgs = {
-    property: string | Array<string>;
-    truthValues: TruthValues;
-    existenceCondition: 'inherent' | Array<EffectConditionArgs>;
-}
 
 export class SubjectPropertyTruths {
     property : string | Array<string>;
     truthValues : TruthValues;
     existenceCondition : string | Array<EffectConditions>;
 
-    constructor(property : string | Array<string>, truthValues : TruthValues, existenceCondition : 'inherent' | Array<EffectConditionArgs> = 'inherent') {
+    constructor(property : string | Array<string>, truthValues : TruthValues, existenceCondition : 'inherent' | Array<EffectConditionData> = 'inherent') {
       this.property = property;
       
       this.truthValues = {

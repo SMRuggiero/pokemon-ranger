@@ -15,7 +15,7 @@ console.log(__dirname);
 
 export function FetchPokemonByName(pokeName, generation) {
 
-    let filepath = __dirname + '/gen' + generation.toString() + '/pokemon/' + pokeName + '.json';
+    let filepath = __dirname + 'data/gen' + generation.toString() + '/pokemon/' + pokeName + '.json';
     let file ;
     try {
         file = openSync(filepath, 'r');

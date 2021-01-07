@@ -3,26 +3,9 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { openSync, readFileSync, closeSync, writeSync } from 'fs';
 
-import * as Effect from './effectHandling.js';
+import { Ability } from './ability.js';
+import * as Effect from '../engine/effects/effectHandling.js';
 
-// Start by implementing Guts
-// Event emitted by CalcDamageMuli?
-// Nah, can use a similar system to manage other multipliers
-
-export class Ability {
-    owner: Effect.EngineObject;
-    name: string;
-    effects: Array<Effect.Effect>;
-
-    constructor(owner: Effect.EngineObject, name : string, effects : Array<Effect.EffectInfo>) {
-      this.owner = owner;
-      this.name = name;
-      Effect.InjectReferences(effects, owner)
-      this.effects = effects.map(element => new Effect.Effect(element.effectType,
-        element.appliesTo,
-        element.conditions));
-    }
-}
 // SPTConstructorTuple = [string | Array<string>, TruthValues, string | ConditionInfoTuples]
 
 // const subjectPropertyTruths = [];
