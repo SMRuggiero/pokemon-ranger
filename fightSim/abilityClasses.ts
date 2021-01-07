@@ -1,19 +1,25 @@
+// These top three imports are for generating a .JSON file with the ability's data structure.
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { openSync, readFileSync, closeSync, writeSync } from 'fs';
+
 import * as Effect from './effectHandling.js';
+
 // Start by implementing Guts
 // Event emitted by CalcDamageMuli?
 // Nah, can use a similar system to manage other multipliers
 
 export class Ability {
-    owner: Effect.Subject;
+    owner: Effect.EngineObject;
     name: string;
-    effects: Array<Effect.EffectDeclaration>;
+    effects: Array<Effect.Effect>;
 
-    constructor(owner: Effect.Subject, name : string, effects : Array<Effect.EffectInfo>) {
+    constructor(owner: Effect.EngineObject, name : string, effects : Array<Effect.EffectInfo>) {
       this.owner = owner;
       this.name = name;
-      this.effects = effects.map(element => new Effect.EffectDeclaration(element.effectType,
+      Effect.InjectReferences(effects, owner)
+      this.effects = effects.map(element => new Effect.Effect(element.effectType,
         element.appliesTo,
-        element.priority,
         element.conditions));
     }
 }
@@ -44,10 +50,10 @@ const moveConditions : Effect.SPTConstructorArgs = {
 const conditionInfo : Array<Effect.EffectConditionArgs> = [
   {
     subject: 'owner',
-    propertyConditions: [ownerConditions],
+    subjectConditions: [ownerConditions],
   }, {
     subject: 'move',
-    propertyConditions: [moveConditions],
+    subjectConditions: [moveConditions],
   },
 ];
 
@@ -61,18 +67,21 @@ const effectInfo : Effect.EffectInfo = {
 // Here be debugging stuff
 /* eslint-disable */
 
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import { openSync, readFileSync, closeSync, writeSync } from 'fs';
 
+const dummyOwner : Effect.EngineObject = {
+  isEngineComponent : false,
+}
+
+const guts = new Ability(dummyOwner, 'Guts', [effectInfo]);
+
+/*
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-const guts = new Ability('null', 'Guts', [effectInfo]);
 
 const gutsString = JSON.stringify(guts);
 
 const file = openSync(__dirname + '\\..\\gen5\\abilities\\Guts.json', 'w');
 writeSync(file, gutsString);
 closeSync(file);
+*/
 const debugDummy = 0;
