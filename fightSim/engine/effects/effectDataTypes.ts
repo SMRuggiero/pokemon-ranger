@@ -1,4 +1,4 @@
-import { Subject } from './effectTypes.js'
+import { Subject } from './effectTypes.js';
 
 export type EffectData = {
   effectType : string,

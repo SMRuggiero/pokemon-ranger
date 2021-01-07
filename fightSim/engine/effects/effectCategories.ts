@@ -1,6 +1,7 @@
 import { EffectConditions } from './effectHandling.js';
 import { EffectConditionData } from './effectDataTypes.js';
 import { Subject } from './effectTypes.js';
+
 export type EffectType = DamageMuli | ConditionAdder;
 
 export class DamageMuli {
@@ -15,9 +16,7 @@ export class DamageMuli {
     this.category = category;
 
     this.multiplier = multiplier;
-
   }
-
 }
 
 export class ConditionAdder {
@@ -25,11 +24,8 @@ export class ConditionAdder {
   addedConditions : Array<EffectConditions>;
 
   constructor(target : string | Subject, addedConditions : Array<EffectConditionData>) {
-
     // target might need a more indepth implementation
     this.target = target;
     this.addedConditions = addedConditions.map(value => new EffectConditions(value.subject, value.subjectConditions));
-
   }
-
 }

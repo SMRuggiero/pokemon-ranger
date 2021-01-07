@@ -1,10 +1,15 @@
 // These top three imports are for generating a .JSON file with the ability's data structure.
+// Here be debugging stuff
+/* eslint-disable */
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { openSync, readFileSync, closeSync, writeSync } from 'fs';
+/* eslint-enable */
 
 import { Ability } from './ability.js';
-import * as Effect from '../engine/effects/effectHandling.js';
+// import * as Effect from '../engine/effects/effectHandling.js';
+import { EffectConditionData, EffectData, SubjectPropertyData } from '../engine/effects/effectDataTypes.js';
+import { EngineObject } from '../engine/effects/effectTypes.js';
 
 // SPTConstructorTuple = [string | Array<string>, TruthValues, string | ConditionInfoTuples]
 
@@ -12,7 +17,7 @@ import * as Effect from '../engine/effects/effectHandling.js';
 
 // ConditionInfoTuples = Array<[Subject, Array<SPTConstructorTuple>]>
 
-const ownerConditions : Effect.SPTConstructorArgs = {
+const ownerConditions : SubjectPropertyData = {
   property: 'persistentStatus',
   truthValues: {
     truthy: [],
@@ -21,7 +26,7 @@ const ownerConditions : Effect.SPTConstructorArgs = {
   existenceCondition: 'inherent',
 };
 
-const moveConditions : Effect.SPTConstructorArgs = {
+const moveConditions : SubjectPropertyData = {
   property: 'calcStats',
   truthValues: {
     truthy: [['attack', true]],
@@ -30,7 +35,7 @@ const moveConditions : Effect.SPTConstructorArgs = {
   existenceCondition: 'inherent', // Maybe true could work here
 };
 
-const conditionInfo : Array<Effect.EffectConditionArgs> = [
+const conditionInfo : Array<EffectConditionData> = [
   {
     subject: 'owner',
     subjectConditions: [ownerConditions],
@@ -40,7 +45,7 @@ const conditionInfo : Array<Effect.EffectConditionArgs> = [
   },
 ];
 
-const effectInfo : Effect.EffectInfo = {
+const effectInfo : EffectData = {
   effectType: 'damageMuli',
   appliesTo: 'owner',
   priority: null,
@@ -51,7 +56,7 @@ const effectInfo : Effect.EffectInfo = {
 /* eslint-disable */
 
 
-const dummyOwner : Effect.EngineObject = {
+const dummyOwner : EngineObject = {
   isEngineComponent : false,
 }
 

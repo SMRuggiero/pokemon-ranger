@@ -7,4 +7,3 @@ export interface EngineObject {
 }
 
 export type Subject = EngineHookTarget | EngineObject;
-
