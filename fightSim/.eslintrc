@@ -28,6 +28,7 @@
   },
   "rules": {
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+    "max-classes-per-file" : ["error", 3],
     "linebreak-style" : "off",
     "react/prop-types": "off",
     "max-len": "off",
