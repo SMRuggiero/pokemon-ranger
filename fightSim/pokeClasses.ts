@@ -1,12 +1,13 @@
 import { Move } from './moveClasses.js'
-import { FetchMoveByName } from './dataFetchers.js'
-import { Ability } from './abilityClasses.js'
+import { FetchMoveByName, PokemonData } from './dataFetchers.js'
+import { Ability } from './abilities/ability.js'
+import { EngineObject } from './engine/core/engineState.js'
+import { MoveContext, BaseStatName, CombatStatName, NatureStat } from './simTypes.js'
 //import { matrix, setCartesian}
 //import { CartesianProduct } from 'js-combinatorics/umd/combinatorics'
 
-export class Pokemon {
 
-    /*
+export class Pokemon implements EngineObject {
     IVs: StatBlock;
 
     EVs : StatBlock;
@@ -15,18 +16,19 @@ export class Pokemon {
 
     nature : StatBlock;
 
-    generation : Number;
+    generation : number;
 
-    level : Number;
+    level : number;
 
     // either [type] or [type, type]
-    type : Array<string>;
+    type : Array<string | null>;
 
     pokeName : string;
 
     //**** me abilities will be annoying to implement
-    ability : Ability;
-    item : string;
+    //ability : Ability;
+    ability : string | null
+    item : string | null;
 
     actualStats : StatBlock;
 
@@ -34,13 +36,15 @@ export class Pokemon {
     moves : Array<Move|null>;
 
 
-    currentHp : Number;
-    persistentStatus : string;
+    currentHp : number;
+    persistentStatus : string | null;
     temporaryStatus : Array<string>;
 
     battleStages : BattleStageManager;
-*/
-    constructor(pokeJSON) {
+
+    isEngineComponent : boolean;
+
+    constructor(pokeJSON : PokemonData) {
         //this.IVs = new StatBlock([0, 31], [0, 31], [0, 31], [0, 31], [0, 31], [0, 31]);
 
         //let pokeData = JSON.parse(pokeJson);
@@ -108,21 +112,35 @@ export class Pokemon {
         //future stuff?
         //back calc IVs from user input
         //EV routing implementation?
+        this.isEngineComponent = true;
 
     };
 
-    EffectiveStat(stat) {
+    EffectiveStat(stat : NatureStat) {
         //I'm assuming this is floored.
         return Math.floor(this.actualStats[stat] * this.battleStages[stat].statMultiplier)
     };
 
-    CalcStat(generation, stat) {
+    CalcStat(generation : number, stat : BaseStatName) {
+        switch (generation) {
+
+            case 1:
+                if (stat === 'specialDefense') throw new RangeError("Gen I doesn't have specialDefense as a stat.");
+            case 2:
+                return Math.floor(((this.baseStats[stat] + this.IVs[stat]) * 2 + Math.floor(Math.ceil(Math.sqrt(this.EVs[stat])) / 4)) * this.level / 100) + 5;
+
+            default:
+                return Math.floor((Math.floor((2 * this.baseStats[stat] + this.IVs[stat] + Math.floor(this.EVs[stat] / 4)) * this.level / 100) + 5) * this.nature[stat]);
+        };
+
+        /* // Stuff for working with multiple level/IV/etc. values
         const level = this.level;
         const baseStat = this.baseStats[stat];
         const IV = this.IVs[stat];
         const EV = this.EVs[stat];
         const nature = this.nature[stat];
 
+        
         let statFunc;
 
         switch (generation) {
@@ -148,9 +166,10 @@ export class Pokemon {
             (Array.isArray(this.level) ? 1 : 0) === 0){ 
                 
         };
+        */
     };
 
-    CalcHP(generation) {
+    CalcHP(generation : number) : number {
         switch (generation) {
 
             case 1:
@@ -173,7 +192,7 @@ export class Pokemon {
 
     };
 
-    ApplyDamage(moveContext, damage) {
+    ApplyDamage(moveContext : MoveContext, damage : number) {
         //Here's where we can check for certain ability/item triggers. When that is set up at least.
 
         this.currentHp -= damage;
@@ -199,6 +218,23 @@ interface PokeJSON{
 */
 
 class StatBlock {
+    _hp : number;
+    _attack : number;
+    _defense : number;
+    _specialAttack : number;
+    _specialDefense : number;
+    _speed : number;
+    monitor : boolean;
+    updatedProperty : [number, number, number, number, number, number];
+    propertyType : {
+        hp : number;
+        attack : number;
+        defense : number;
+        specialAttack : number;
+        specialDefense : number;
+        speed : number;
+
+    }
 
     /*
     constructor(hp, attack, defense, specialAttack, specialDefense, speed) {
@@ -210,7 +246,7 @@ class StatBlock {
         this.speed = speed;
     };*/
 
-    constructor(hp, attack, defense, specialAttack, specialDefense, speed, monitorPropertyType) {
+    constructor(hp : number, attack : number, defense : number, specialAttack : number, specialDefense : number, speed : number, monitorPropertyType : boolean = false) {
         this._hp = hp;
         this._attack = attack;
         this._defense = defense;
@@ -219,12 +255,12 @@ class StatBlock {
         this._speed = speed;
         this.monitor = monitorPropertyType;
         this.updatedProperty = [0,0,0,0,0,0];
-        this.propertyType = {hp : Array.isArray(this._hp),
-                            attack : Array.isArray(this._attack),
-                            defense : Array.isArray(this._defense),
-                            specialAttack : Array.isArray(this._specialAttack),
-                            specialDefense : Array.isArray(this._specialDefense),
-                            speed : Array.isArray(this._speed)}; //0 for scalar, 1 for array
+        this.propertyType = {hp : Array.isArray(this._hp) ? 1 : 0,
+                            attack : Array.isArray(this._attack) ? 1 : 0,
+                            defense : Array.isArray(this._defense) ? 1 : 0,
+                            specialAttack : Array.isArray(this._specialAttack) ? 1 : 0,
+                            specialDefense : Array.isArray(this._specialDefense) ? 1 : 0,
+                            speed : Array.isArray(this._speed) ? 1 : 0}; //0 for scalar, 1 for array
     };
 
     get hp(){
@@ -368,8 +404,15 @@ class StatBlock {
 };
 
 class BattleStageManager {
+    attack : StatStage;
+    defense : StatStage;
+    specialAttack : StatStage;
+    specialDefense : StatStage;
+    speed : StatStage;
+    accuracy : EvAccStatStage;
+    evasion : EvAccStatStage;
 
-    constructor(generation) {
+    constructor(generation : number) {
         this.attack = new StatStage(generation);
         this.defense = new StatStage(generation);
         this.specialAttack = new StatStage(generation);
@@ -394,8 +437,10 @@ class BattleStageManager {
 
 
 class StatStage {
+    _stage : number;
+    multiplierMap : [number, number, number, number, number, number, number, number, number, number, number, number, number]
 
-    constructor(generation) {
+    constructor(generation : number) {
         this._stage = 0;
         if (generation < 3) {
             this.multiplierMap = [25 / 100, 28 / 100, 33 / 100, 40 / 100, 50 / 100, 66 / 100, 1, 150 / 100, 200 / 100, 250 / 100, 300 / 100, 350 / 100, 400 / 100];
@@ -420,7 +465,12 @@ class StatStage {
 
 
 export class EvAccStatStage {
-    constructor(generation, isEvasion) {
+    _stage : number;
+    multiplierMap : [number, number, number, number, number, number, number, number, number, number, number, number, number]
+    isEvasion : boolean;
+    generation : number;
+
+    constructor(generation : number, isEvasion : boolean) {
         this._stage = 0
 
         this.isEvasion = isEvasion
@@ -449,10 +499,10 @@ export class EvAccStatStage {
         return this.isEvasion ? this.multiplierMap[-this.stage + 6] : this.multiplierMap[this.stage + 6]
     };
 
-    static calcAccMultiplier(moveContext, attackingPokemon, defendingPokemon) {
+    static calcAccMultiplier(moveContext : MoveContext, attackingPokemon : Pokemon, defendingPokemon : Pokemon) {
         if (moveContext.generation < 3) {
 
-            return attackingPokemon.battleStages.accuracy.statMultiplier * defendingPokemon.evasion.statMultiplier;
+            return attackingPokemon.battleStages.accuracy.statMultiplier * defendingPokemon.battleStages.evasion.statMultiplier;
 
         } else {
             let stageSum = attackingPokemon.battleStages.accuracy.stage - defendingPokemon.battleStages.evasion.stage;
@@ -462,6 +512,15 @@ export class EvAccStatStage {
             return attackingPokemon.battleStages.accuracy.multiplierMap[stageSum]
         }
         
+    };
+
+    set stage(val) {
+        //force val to be within [-6, 6]
+        this._stage = Math.min(6, Math.max(-6, val))
+    };
+
+    get stage() {
+        return this._stage
     };
 };
 

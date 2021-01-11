@@ -1,9 +1,32 @@
 import { typeEnumerator, FetchTypeMatchup } from './typeMatrix.js';
+import { NatureStat, MoveContext } from './simTypes.js'
+import { Pokemon } from './pokeClasses.js'
+import { MoveData } from './dataFetchers.js'
 
 export class Move {
+    category : string;
+
+    calcStats : [NatureStat, NatureStat];
+    type : string;
+    maxPP : number;
+    currentPP : number;
+    power : number;
+    accuracy : number;
+    priority : number;
+    contact : boolean;
+    moveName : string;
+
+    stabMulti : number;
+
+    targeting :[[number, number, number],[number, number, number]];
+
+
+    randomRolls : number;
+
+    typeMatrix : Array<Array<number | null>>
 
     //constructor(category, type, maxPP, power, accuracy, priority, contact) {
-    constructor(moveJSON) {
+    constructor(moveJSON : MoveData) {
 
 
         this.category = moveJSON.category;
@@ -40,7 +63,7 @@ export class Move {
 
     };
 
-    UseMove(moveContext, attacker, defender) {
+    UseMove(moveContext : MoveContext, attacker : Pokemon, defender : Pokemon) {
         if (this.currentPP <= 0) throw Error("Can't use a move at 0 PP!");
         this.currentPP -= 1
 
@@ -55,12 +78,12 @@ export class Move {
         this.AdditionalEffect(moveContext, attacker, defender);
     };
 
-    AdditionalEffect(moveContext, attacker, defender) {
+    AdditionalEffect(moveContext : MoveContext, attacker : Pokemon, defender : Pokemon) {
         //move dependent implementation
         return
     };
 
-    CalcDamage(moveContext, attacker, defender) {
+    CalcDamage(moveContext : MoveContext, attacker : Pokemon, defender : Pokemon) {
         //implement Critical Calcs
         //  RaNdOmNeSs - move this roll into the moveContext to enable control of randomness (ie to methodically calculate all possible damage values)
 
@@ -77,7 +100,7 @@ export class Move {
             baseDamage);
     };
 
-    CalcDamageMultipliers(moveContext, attacker, defender) {
+    CalcDamageMultipliers(moveContext : MoveContext, attacker : Pokemon, defender : Pokemon) {
         //Implement this.
         //Includes:
         //  Targets Gen III + : Gen III - 1 or 0.5, Gen IV+ 1 or 0.75
@@ -96,11 +119,16 @@ export class Move {
             1.0);
         console.log(stab);
         const typeEffect = defender.type.reduce(
-            (typeEffectAccum, currentType) => { return typeEffectAccum * this.typeMatrix[typeEnumerator[this.type]][typeEnumerator[currentType]] },
+            (typeEffectAccum, currentType) => {
+                if (currentType === null) return typeEffectAccum
+                const typeMulti = this.typeMatrix[typeEnumerator[this.type]][typeEnumerator[currentType]];
+                if (typeMulti === null) throw new Error('Either the move type or a defender type does not exist in this generation.');
+                return typeEffectAccum * typeMulti;
+            },
             1.0);
         console.log(typeEffect);
 
-        return [moveContext.random, stab, typeEffect]
+        return [stab, typeEffect]
     }
 
 };

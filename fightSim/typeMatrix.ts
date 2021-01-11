@@ -1,5 +1,4 @@
-export const typeEnumerator = {
-
+export const typeEnumerator : Record<string, number> = {
     Normal: 0,
     Fighting: 1,
     Flying: 2,
@@ -22,7 +21,7 @@ export const typeEnumerator = {
 };
     // typeMatchup[attackType][defenderType_i]
     // indicies assume type line up with typeEnumerator above
-const typeMatchupTemplate = [
+const typeMatchupTemplate : Array<Array<number>> = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -42,7 +41,7 @@ const typeMatchupTemplate = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
-const typeMatchupGenVI = [
+const typeMatchupGenVI : Array<Array<number>> = [
     [1, 1, 1, 1, 1, 0.5, 1, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [2, 1, 0.5, 0.5, 1, 2, 0.5, 0, 2, 1, 1, 1, 1, 0.5, 2, 1, 2, 0.5],
     [1, 2, 1, 1, 1, 0.5, 2, 1, 0.5, 1, 1, 2, 0.5, 1, 1, 1, 1, 1],
@@ -63,7 +62,7 @@ const typeMatchupGenVI = [
     [1, 2, 1, 0.5, 1, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 1, 1, 2, 2, 1]
 ];
 
-const typeMatchupGenII = [
+const typeMatchupGenII : Array<Array<number|null>> = [
     [1, 1, 1, 1, 1, 0.5, 1, 0, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, null],
     [2, 1, 0.5, 0.5, 1, 2, 0.5, 0, 2, 1, 1, 1, 1, 0.5, 2, 1, 2, null],
     [1, 2, 1, 1, 1, 0.5, 2, 1, 0.5, 1, 1, 2, 0.5, 1, 1, 1, 1, null],
@@ -84,7 +83,7 @@ const typeMatchupGenII = [
     [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 ];
 
-const typeMatchupGenI = [
+const typeMatchupGenI : Array<Array<number|null>> = [
     [1, 1, 1, 1, 1, 0.5, 1, 0, null, 1, 1, 1, 1, 1, 1, 1, null, null],
     [2, 1, 0.5, 0.5, 1, 2, 0.5, 0, null, 1, 1, 1, 1, 0.5, 2, 1, null, null],
     [1, 2, 1, 1, 1, 0.5, 2, 1, null, 1, 1, 2, 0.5, 1, 1, 1, null, null],
@@ -105,7 +104,7 @@ const typeMatchupGenI = [
     [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 ];
 
-export function FetchTypeMatchup(generation) {
+export function FetchTypeMatchup(generation : number) {
     switch (generation) {
         case 1:
             return typeMatchupGenI;
