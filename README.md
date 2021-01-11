@@ -104,6 +104,61 @@ The content within the square brackets is displayed as a header above the table,
 
 `generation` (number, default: `4`) - The generation of the game in which the attack takes place.
 
+### Trainer Blocks
+
+Trainer blocks are useful for organizing content by fight and ensure child Pokémon blocks (see below) are rendered correctly.
+The value in square brackets (`[]`) should be the trainer's name and will be rendered as a subheader. All attributes are optional; if you don't need to specify any attributes, you can omit the curly braces (`{}`).
+
+#### Syntax
+
+```
+:::trainer[Youngster Joey]{info="His Ratata is top percentage!" infoColor=blue}
+
+:::
+```
+
+**Attributes**
+
+`info` (string) - Text to display next to the trainer's name.
+`infoColor` (string) - The color of the info text. Any color accepted by `:info` is accepted here (see below).
+
+### Pokémon Blocks
+
+Pokémon blocks group the instructions for defeating a specific opponent Pokémon and ensure the list of moves is rendered correctly. The value in square brackets (`[]`) should be the Pokémon's name. All attributes are optional; if you don't need to specify any attributes, you can omit the curly braces (`{}`).
+
+It's recommended you format the fight instructions as an unordered list. Bullets will not be rendered, but the instructions will be spaced properly; see the example below.
+
+#### Syntax
+
+```
+:::pokemon[Drifloon]{info="Faster at 23+ Speed (x/8+/0+)" infoColor=blue}
+  - Work Up
+  - Crunch
+  - (Crunch)
+:::
+```
+
+**Note:** Block directives can only be nested if the parent block is prefixed by more colons than the child. Since you should next Pokémon blocks within Trainer blocks, you should define the Trainer blocks with _at least_ four colons (`::::trainer`); five is recommended for better spacing. Furthermore, if you are using `:if` conditions, you need to use even more colons. A trainer with an conditional fight might look like this:
+
+```
+:::::::trainer[Ace Trainer Dennis]
+  :::::pokemon[Drifblim]
+    :::if{source="Starly" condition="atk=(# / 12- / 2-)"}
+      - X Attack
+      - Wing Attack x2
+    :::
+    :::if{source="Starly" condition="atk=(x / 13+ / 3+)"}
+      - Wing Attack x2
+    :::
+  :::::
+:::::::
+```
+
+**Attributes**
+
+`info` (string) - Text to display next to the Pokémon's name.
+`infoColor` (string) - The color of the info text. Any color accepted by `:info` is accepted here (see below).
+
 ### Conditional Cards
 
 Conditional cards are displayed only if the stats of the runner's Pokémon meet a criteria. Conditional cards are useful for displaying variant strategies in the route; for example, a Pokémon with low Attack may need to get an additional Rare Candy. With a conditional card, those instructions are only shown if the Pokémon's Attack is low enough to justify the detour.
@@ -149,13 +204,42 @@ Ranges must be in stat range format or IV range format:
 Stat ranges are compared against the calculated statistic at the specified level; e.g. "What is the Pokémon's Attack at level 12?". Stat ranges can be
 a single value (12), a minimum value (12+), a maximum value (12-), or a range (12-14). If the range of possible stats that the Pokémon can have given its calculated IVs overlap the stat range, the conditional card is displayed.
 
-IV ranges are compared against the Pokémon's IVs, and are level agnostic. IV ranges have the format `negative / neutral / positive`, where `negative` is the range of possible IVs with a nature that reduces the stat, `neutral` is the range of possible IVs with a nature that does not affect the stat, and `positive` is the range of possible IVs with a nature that boosts the stat. IV ranges can optionally be surrounded by parentheses.
+IV ranges are compared against the Pokémon's IVs, and are level agnostic. IV ranges have the format `negative / neutral / positive`, where `negative` is the range of possible IVs with a nature that reduces the stat, `neutral` is the range of possible IVs with a nature that does not affect the stat, and `positive` is the range of possible IVs with a nature that boosts the stat. IV ranges can optionally be surrounded by parentheses. If an IV range is prefixed by a tilde (`~`), the
+inverse of the range is used instead. Inverses may only be used if each section of the IV range is an unbounded value, 0,
+or 31. (i.e. one of `x`, `X`, `#`, `0`, `31`, `[number]+`, or `[number]-`).
 
 IV ranges are evaluated in the same manner as stat ranges, except that they are compared against the range of possible IVs calculated by the IV tracker rather than against the range of possible stats. Additionally, IV ranges accept some special tokens:
 
 `#` - Matches any value (e.g. `x/x/#` matches any positive nature IV)
 
 `x` or `X` - Matches no values (e.g. `x/x/#` matches no negative or neutral nature IVs)
+
+**Warning: Defining Conditional Fights**
+
+When defining conditional fights ("do this strategy if your stats are lower than X"), it's tempting to define the "better" fight, and then insert a condition that adds a turn for low stats, like such:
+
+```
+- Work Up
+:::if{source="Lillipup" condition="atk=(# / 22- / 6-)"}
+- Work Up
+:::
+- Strength
+```
+
+**This is not recommended.** Until the IVs are narrowed to the point where the condition is _impossible_, the conditional block will appear. This makes the fight confusing if your IVs _are_ likely high, but can _potentially_ be low enough to trigger the alternate fight. A more clear way to define the above fight is:
+
+```
+:::if{source="Lillipup" condition="atk=(# / 22- / 6-)"}
+  - Work Up x2
+  - Strength
+:::
+:::if{source="Lillipup" condition="atk=(x / 23+ / 7+)"}
+  - Work Up
+  - Strength
+:::
+```
+
+This will render both fights with a divider, allowing the runner to better decide which strategy they want to use.
 
 ### Cards
 
