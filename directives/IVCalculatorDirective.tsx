@@ -13,14 +13,22 @@ const EV_SECTION_REGEX = /^([1-9][0-9]*):/g;
 interface IVCalculatorDirectiveProps {
   species?: string;
   baseStats?: string;
+  generation?: string;
   contents?: string;
+  hiddenPower?: string;
 }
 
 function arrayToStatRow([hp, attack, defense, spAttack, spDefense, speed]: number[]): StatLine {
   return { hp, attack, defense, spAttack, spDefense, speed };
 }
 
-export const IVCalculatorDirective: React.FC<IVCalculatorDirectiveProps> = ({ species, baseStats: rawBaseStats, contents }) => {
+export const IVCalculatorDirective: React.FC<IVCalculatorDirectiveProps> = ({
+  species,
+  baseStats: rawBaseStats,
+  generation,
+  hiddenPower,
+  contents,
+}) => {
   const dispatch = RouteContext.useDispatch();
 
   const hasRegistered = useRef(false);
@@ -77,10 +85,16 @@ export const IVCalculatorDirective: React.FC<IVCalculatorDirectiveProps> = ({ sp
 
   useEffect(() => {
     if (!hasRegistered.current) {
-      dispatch(registerTracker(species ?? '<no name specified>', baseStats, evSegments));
+      dispatch(registerTracker(
+        species ?? '<no name specified>',
+        baseStats,
+        generation === 'lgpe' ? 'lgpe' : Number(generation || 4),
+        hiddenPower === 'true',
+        evSegments,
+      ));
       hasRegistered.current = true;
     }
-  }, [dispatch, species, baseStats, evSegments]);
+  }, [dispatch, species, baseStats, hiddenPower, evSegments, generation]);
   
   return null;
 };

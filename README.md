@@ -8,6 +8,8 @@ Routefiles use [generic directives](https://talk.commonmark.org/t/generic-direct
 
 Routefiles must end in `.md` or `.mdr` (markdown route) for Ranger to process them.
 
+**Cheat sheet**: https://github.com/Corvimae/pokemon-ranger/blob/main/cheatsheet.md
+
 ### IV Trackers
 
 IV trackers determine the possible IVs and nature of a Pokémon based on the information available to the runner. As a Pokémon levels up, the runner can input its stats into the IV tracker, which will then calculate the possible IV ranges that result in the stats entered at each level.
@@ -30,6 +32,10 @@ A route file can contain any number of IV trackers, but in order to take advanta
 `species` - The name of the Pokemon. This is used as a unique identifier for the tracker and is displayed in the sidebar.
 
 `baseStats` - A JSON-formatted array of base stats for each of the Pokémon's evolutions. If the Pokémon has no evolutions, you should still provide an array-of-arrays (e.g. `[[50, 50, 50, 50, 50, 50]]`).
+
+`hiddenPower` (default: false) - If true, hidden power type will be calculated and displayed.
+
+`generation` (default: 4) - Which generation's formulas to use. Gen 1-2 are not supported, and specifying `lgpe` will change results.
 
 **Content**
 
@@ -102,7 +108,7 @@ The content within the square brackets is displayed as a header above the table,
 
 `otherModifier` (number, default: `1`) - An additional modifier to apply to the roll.
 
-`generation` (number, default: `4`) - The generation of the game in which the attack takes place.
+`friendship` (number, default: `0`) - The friendship of the Pokémon, from 0-255. Only relevant if the tracker's generation is `lgpe`.
 
 ### Trainer Blocks
 
@@ -182,7 +188,7 @@ The content of the conditional card can be any valid Markdown, including Ranger 
 
 `evolution` (number) - The evolution of the runner's Pokémon at the time the conditional card is relevant, zero-indexed. If not specified, the current evolutionary stage of the associated IV tracker is used.
 
-`theme` (string) - The color theme to apply to the card. Valid themes are `info`, `error`, `warning`, `success`, `borderless`, `faint`, and `neutral`. If no theme is specified, or the specified theme is invalid, `borderless` (blue) is used. The `borderless` and `faint` themes appear "inline", with no special styling around the card.
+`theme` (string) - The color theme to apply to the card. Valid themes are `info`, `error`, `warning`, `success`, `borderless`, `faint`, and `neutral`. If no theme is specified, or the specified theme is invalid, `borderless` is used. The `borderless` and `faint` themes appear "inline", with no special styling around the card.
 
 **Conditions**
 
@@ -248,7 +254,7 @@ Cards can also be used without a condition to separate content and draw prominen
 #### Syntax
 ```
 :::card{theme="neutral"}
-Welcome to my rouse1
+Welcome to my route!
 :::
 ```
 
