@@ -1,5 +1,5 @@
 import { EffectData, EffectConditionData, SubjectPropertyData } from './effectDataTypes.js';
-import { EngineObject } from './effectTypes.js';
+import { EngineObject } from '../core/engineState.js'
 
 // Ungodly type shenanagans by May. No idea what's going on here, but these types make the function
 // work without TypeScript complaining and while still being typesafe.

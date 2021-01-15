@@ -1,25 +1,38 @@
 import { EffectConditions } from './effectHandling.js';
 import { EffectConditionData } from './effectDataTypes.js';
 import { Subject } from './effectTypes.js';
+import { EngineState, EngineObject } from '../core/engineState.js'
 
-export type EffectType = DamageMuli | ConditionAdder;
+export interface EffectType{
 
-export class DamageMuli {
-  category : string;
-  multiplier : number;
-
-  constructor(category : string, multiplier : number) {
-    // valid categories: Weather, Burn, Other
-    // other categories exist, but they are handled entirely by the engine
-    // All categories in order of application:
-    // Targets -> Weather -> Badge -> Critical -> Random -> STAB -> Type -> Burn -> Other
-    this.category = category;
-
-    this.multiplier = multiplier;
-  }
 }
 
-export class ConditionAdder {
+//export type EngineState
+
+
+
+
+/*
+function DamageMulti(moveContext : EngineState, attacker : EngineObject, defender : EngineObject) {
+
+  const stab = attacker.type.reduce(
+      (stabAccum, currentType) => { return (currentType === this.type) ? this.stabMulti : stabAccum },
+      1.0);
+  console.log(stab);
+  const typeEffect = defender.type.reduce(
+      (typeEffectAccum, currentType) => { return typeEffectAccum * this.typeMatrix[typeEnumerator[this.type]][typeEnumerator[currentType]] },
+      1.0);
+  console.log(typeEffect);
+
+  return [moveContext.random, stab, typeEffect]
+}
+
+EngineDamageMulti = RegisterEngineCall('DamageMutli', ,)
+*/
+
+
+
+export class ConditionAdder implements EffectType{
   target : string | Subject;
   addedConditions : Array<EffectConditions>;
 

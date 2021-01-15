@@ -9,7 +9,7 @@ import { openSync, readFileSync, closeSync, writeSync } from 'fs';
 import { Ability } from './ability.js';
 // import * as Effect from '../engine/effects/effectHandling.js';
 import { EffectConditionData, EffectData, SubjectPropertyData } from '../engine/effects/effectDataTypes.js';
-import { EngineObject } from '../engine/effects/effectTypes.js';
+import { EngineObject } from '../engine/core/engineState.js'
 
 // SPTConstructorTuple = [string | Array<string>, TruthValues, string | ConditionInfoTuples]
 

@@ -1,6 +1,6 @@
 // These top three imports are for generating a .JSON file with the ability's data structure.
 // I'll want to rewrite these imports once I get the Effects portion of the engine packages up.
-import { EngineObject } from '../engine/effects/effectTypes.js';
+import { EngineObject } from '../engine/core/engineState.js'
 import { EffectData } from '../engine/effects/effectDataTypes.js';
 import { Effect } from '../engine/effects/effectHandling.js';
 import { InjectReferences } from '../engine/effects/injectReferences.js';

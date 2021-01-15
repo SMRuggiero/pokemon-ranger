@@ -1,9 +1,9 @@
 // Placeholder types. To be expanded upon engine core development
+import { EngineObject } from '../core/engineState.js'
+
 
 export type EngineHookTarget = string;
 
-export interface EngineObject {
-  isEngineComponent : boolean;
-}
+
 
 export type Subject = EngineHookTarget | EngineObject;

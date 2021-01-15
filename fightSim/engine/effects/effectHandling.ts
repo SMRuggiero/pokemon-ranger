@@ -1,5 +1,6 @@
 import { Subject } from './effectTypes.js';
 import { EffectConditionData, TruthValues, SubjectPropertyData } from './effectDataTypes.js';
+import { dynamicReferences, DynamicReferences } from '../core/engineState.js'
 
 // type InjectableProperty<T> = string | T;
 
@@ -25,6 +26,19 @@ export class Effect {
       // Force this to always be 'inherent' if string?
       this.existenceCondition = (typeof existenceCondition === 'string') ? existenceCondition : existenceCondition.map(value => new EffectConditions(value.subject, value.subjectConditions));
     }
+    
+    CheckExistence() : -1 | 0 | 1 {
+
+      // placeholder
+      return 0
+    }
+
+    CheckConditions() : boolean{
+
+      // placeholder
+      return false
+    }
+
 }
 
 export class EffectConditions {
@@ -46,6 +60,18 @@ export class EffectConditions {
                 existenceCondition : "inherent" //Maybe true could work here
             }]
         } */
+    }
+
+    CheckConditions() : boolean {
+      for (let i = 0; i<this.subjectConditions.length; i += 1){
+        let currentProp = this.subjectConditions[i].property;
+        if (Array.isArray(currentProp)) {
+          if (!(currentProp[0] in this.subject))
+        }
+      }
+      // placeholder
+
+      return false
     }
 }
 
