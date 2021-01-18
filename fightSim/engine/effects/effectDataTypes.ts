@@ -1,11 +1,15 @@
+import { EffectType } from './effectCategories.js';
 import { Subject } from './effectTypes.js';
 
 export type EffectData = {
-  effectType : string,
+  effectType : string | EffectType;
   appliesTo : Subject;
-  priority : number | null,
-  conditions : Array<EffectConditionData>
+  priority : number | null;
+  conditions : Array<EffectConditionData>;
+  when : TimingData;
 }
+
+export type TimingData = 'immediate' | ['on' | 'after', string];
 
 export type EffectConditionData = {
   subject: Subject;
